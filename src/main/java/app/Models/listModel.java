@@ -2,10 +2,7 @@ package app.Models;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
 @Entity
@@ -16,6 +13,10 @@ public class listModel {
     private Integer id;
     @Column(name = "userid")
     private String userid;
-    @Column(name = "listName")
+    @Column(name = "list_name")
     private String listName;
+
+//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+//    @JoinColumn(name = "userid", nullable = false)
+//    private userModel userid;
 }

@@ -12,4 +12,6 @@ public interface userRepo extends CrudRepository<userModel,Integer> {
     userModel findByUser(String user);
     @Query(value = "select * from user u where u.user = ?1 and u.password = ?2 ",nativeQuery = true)
     userModel findByUserAndPass(String user, String password);
+    @Query(value = "select id from user u where u.user = ?1 ",nativeQuery = true)
+    Integer findByUserAndGiveID(String user);
 }

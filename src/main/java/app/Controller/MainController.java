@@ -1,5 +1,7 @@
 package app.Controller;
 
+import app.Repositories.itemRepo;
+import app.Repositories.listRepo;
 import app.Repositories.userRepo;
 import app.Models.userModel;
 //import app.Service.webServices;
@@ -8,7 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 public class MainController {
@@ -42,14 +48,18 @@ public class MainController {
     //4XX - client error
     //5XX - server error
     @Autowired
-    private userRepo repo;
+    private userRepo urepo;
+    @Autowired
+    private listRepo lrepo;
+    @Autowired
+    private itemRepo Irepo;
 //    @Autowired
 //    private webServices service;
 
     //Get - FIND ALL
     @GetMapping(path = "/findall")
     public @ResponseBody Iterable<userModel> getAllUser() {
-        return repo.findAll();
+        return urepo.findAll();
 //        return service.findAllService();
     }
 
@@ -57,31 +67,74 @@ public class MainController {
     @GetMapping(path = "/findbyuser/{user}")
     public @ResponseBody
     String getById(@PathVariable String user) {
-        return repo.findByUser(user).getUser();
+        return urepo.findByUser(user).getUser();
     }
+
     //GET - FIND BY USER&PASS
+    // for test: http://localhost:8080/login?user=test&pass=test
     @GetMapping(path = "/login")
     public @ResponseBody
     String getById(@RequestParam String user, @RequestParam String pass) {
         try {
-
-            return repo.findByUserAndPass(user, pass).getUser();
+            return urepo.findByUserAndPass(user, pass).getUser();
         }catch (Exception ex){
             return null;
         }
     }
     //GET - FIND LIST BY USER
-    @GetMapping(path = "/findListByUser/")
-    public @ResponseBody String getbyListUser(@PathVariable String user) {
-        return repo.findByUser(user).getUser();
+    //http://localhost:8080/findListByUser?user=test
+    @GetMapping(path = "/findListByUser")
+    public @ResponseBody
+    List<String> getbyListUser(@RequestParam String user) {
+        Integer userData = urepo.findByUserAndGiveID(user);
+        return lrepo.findAllListFromUserID(userData);
+//        return null;
     }
-    //GET - FIND ITEM BY LIST&USER
-    @GetMapping(path = "/findbyuser/{user}")
-    public @ResponseBody String getByItemListUser(@PathVariable String user,@PathVariable String list) {
-        return repo.findByUser(user).getUser();
+    //GET - FIND List by userid
+    @GetMapping(path = "/findbyuserid/{number}")
+    public @ResponseBody List<String> getByListUser(@PathVariable Integer number) {
+        return lrepo.findAllListFromUserID(number);
+//    return null;
+    }
+    //GET - FIND ITEM BY listid
+    @GetMapping(path = "/finditembyidlist/{number}")
+    public @ResponseBody List<String> getByItemListUser(@PathVariable Integer number) {
+        List<String> itemList = Irepo.findAllItemFromListID(number);
+        List<String> descList = Irepo.findAlldescFromListID(number);
+        ArrayList<String> ResultList = new ArrayList<>();
+        int count2 = 0;
+        for(int count = 0;count<=itemList.size()-1;count++){
+            ResultList.add(count2,itemList.get(count));
+            count2++;
+            ResultList.add(count2,descList.get(count));
+            count2++;
+        }
+        return ResultList;
     }
 
-
+    //erroring out.
+    @GetMapping(path = "/findAllListAndItem")
+    public @ResponseBody List<String> getByuserAllListAndItem(@RequestParam String user) {
+        Integer userData = urepo.findByUserAndGiveID(user);
+        List<String> ListOfUser = lrepo.findAllListFromUserIDAndGiveID(userData);
+        List<String> itemList = null;
+        List<String> descList = null;
+        int count3=0;
+        while(ListOfUser.size()>count3){
+            itemList = Irepo.findAllItemFromListID(Integer.parseInt(ListOfUser.get(count3)));
+            descList = Irepo.findAlldescFromListID(Integer.parseInt(ListOfUser.get(count3)));
+            count3++;
+        }
+        ArrayList<String> ResultList = new ArrayList<>();
+        int count2 = 0;
+        for(int count = 0;count<=itemList.size()-1;count++){
+            ResultList.add(count2,itemList.get(count));
+            count2++;
+            ResultList.add(count2,descList.get(count));
+            count2++;
+        }
+        return ResultList;
+    }
     //Validate User login
     // Method - GET
     // Get User/Pass

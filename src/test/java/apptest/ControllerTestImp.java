@@ -2,7 +2,7 @@ package apptest;
 
 import app.Controller.MainController;
 import app.apprun;
-import app.Service.webServices;
+//import app.Service.webServices;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +29,8 @@ public class ControllerTestImp {
     @Autowired
     private MainController Cont;
 
-    @Autowired
-    private webServices service;
+//    @Autowired
+//    private webServices service;
 
     @Autowired
     private MockMvc mockMvc;
